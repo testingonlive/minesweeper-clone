@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>   
+    
+</head>
+
+<body>
+    <canvas id="canvas" width="150" height="150"></canvas>
+    
+    <script>
+        function draw() {
+            var canvas = document.getElementById("canvas");
+            if (canvas.getContext) {
+                var ctx = canvas.getContext("2d");
+
+                ctx.drawImage( drawRect( 'empty' ), 10, 10 );
+                ctx.drawImage( drawRect( 'hidden' ), 10, 50 );
+                            
+            }
+        }
+        
+        
+        
+        function drawRect( state ){
+            
+            if ( drawRect[ state ] ) return drawRect[ state ];
+            
+            var canvas = document.createElement( 'canvas' );
+            canvas.width = 25;
+            canvas.height = 25;
+            
+            var ctx = canvas.getContext( '2d' );
+            
+            switch ( state ){
+                case 'empty':
+                    ctx.fillStyle = 'grey';
+                    ctx.fillRect( 0, 0, 25, 25 );
+                    break;
+                    
+                case 'hidden':
+                    ctx.fillStyle = 'grey';
+                    ctx.fillRect( 0, 0, 25, 25 );
+                    ctx.lineWidth = 5;
+                    
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.fillStyle = 'red';
+                    ctx.moveTo( 0, 0);
+                    ctx.lineTo( 5, 5 );
+                    ctx.lineTo( 5, 20 );
+                    ctx.lineTo( 0, 25 );
+                    ctx.lineTo( 0, 0 );
+                    ctx.rotate( ( Math.PI / 180 ) * 0 );
+                    ctx.fill();
+                    ctx.restore();
+                    
+                    ctx.save();
+                    ctx.translate( 25, 0 );
+                    ctx.rotate( ( Math.PI / 180 ) * 90 );                    
+                    ctx.beginPath();
+                    ctx.fillStyle = 'blue';
+                    ctx.moveTo( 0, 0);
+                    ctx.lineTo( 5, 5 );
+                    ctx.lineTo( 5, 20 );
+                    ctx.lineTo( 0, 25 );
+                    ctx.lineTo( 0, 0 );
+                    ctx.fill();
+                    ctx.translate( -25, -0 );
+                    ctx.restore();
+                    
+                    ctx.save();
+                    ctx.translate( 25, 25 );
+                    ctx.rotate( ( Math.PI / 180 ) * 180 );                    
+                    ctx.beginPath();
+                    ctx.fillStyle = 'green';
+                    ctx.moveTo( 0, 0);
+                    ctx.lineTo( 5, 5 );
+                    ctx.lineTo( 5, 20 );
+                    ctx.lineTo( 0, 25 );
+                    ctx.lineTo( 0, 0 );
+                    ctx.fill();
+                    ctx.translate( -25, -25 );
+                    ctx.restore();
+                    
+                    ctx.save();
+                    ctx.translate( 0, 25 );
+                    ctx.rotate( ( Math.PI / 180 ) * 270 );                    
+                    ctx.beginPath();
+                    ctx.fillStyle = 'orange';
+                    ctx.moveTo( 0, 0);
+                    ctx.lineTo( 5, 5 );
+                    ctx.lineTo( 5, 20 );
+                    ctx.lineTo( 0, 25 );
+                    ctx.lineTo( 0, 0 );
+                    ctx.fill();
+                    ctx.translate( -0, -25 );
+                    ctx.restore();
+                                      
+                     
+                    break;
+            }
+            
+            
+            
+            
+            return drawRect[ state ] = canvas;
+            
+        }
+        
+        
+        draw();
+        
+        
+    </script>
+</body>
+
+</html>
