@@ -6,7 +6,7 @@
 </head>
 
 <body>
-    <canvas id="canvas" width="150" height="150"></canvas>
+    <canvas id="canvas" width="150" height="1200"></canvas>
     
     <script>
         function draw() {
@@ -14,8 +14,11 @@
             if (canvas.getContext) {
                 var ctx = canvas.getContext("2d");
 
-                ctx.drawImage( drawRect( 'empty' ), 10, 10 );
-                ctx.drawImage( drawRect( 'hidden' ), 10, 50 );
+                [ 'empty', 'hidden', 'mine', '1', '2', '3', '4', '5', '6', '7', '8' ]
+                
+                .forEach(function( elm, ind ){
+                     ctx.drawImage( drawRect( elm ), 10, 100 * ind + 10 );
+                });
                             
             }
         }
@@ -26,79 +29,110 @@
             
             if ( drawRect[ state ] ) return drawRect[ state ];
             
-            var canvas = document.createElement( 'canvas' );
-            canvas.width = 25;
-            canvas.height = 25;
+            var widthHeight = 70,
+                borderWidth = 7,
+                canvas = document.createElement( 'canvas' ),
+                ctx = canvas.getContext( '2d' ),
+                _img,
+                _pattern = (function(){
+                    var canvas = document.createElement( 'canvas' ),
+                        ctx = canvas.getContext( '2d' );
+
+                    canvas.height = canvas.width = borderWidth * 2;
+
+                    with ( ctx ){
+                        fillStyle = '#d5d5d5';
+                        fillRect( 0, 0, borderWidth, borderWidth );
+
+                        fillStyle = '#d0d0d0';
+                        fillRect( 0, borderWidth, borderWidth, borderWidth );
+
+                        fillStyle = '#d0d0d0';
+                        fillRect( borderWidth, 0, borderWidth, borderWidth );
+
+                        fillStyle = '#d5d5d5';
+                        fillRect( borderWidth, borderWidth, borderWidth, borderWidth );
+                    }
+
+                    return canvas;
+
+                }());
             
-            var ctx = canvas.getContext( '2d' );
+            canvas.height = canvas.width = widthHeight;          
+           
             
             switch ( state ){
-                case 'empty':
-                    ctx.fillStyle = 'grey';
-                    ctx.fillRect( 0, 0, 25, 25 );
+                case 'empty':                 
+                    
+                    ctx.fillStyle = ctx.createPattern( _pattern, 'repeat' );
+                    ctx.fillRect( 0, 0, widthHeight, widthHeight );
                     break;
                     
                 case 'hidden':
-                    ctx.fillStyle = 'grey';
-                    ctx.fillRect( 0, 0, 25, 25 );
-                    ctx.lineWidth = 5;
+                case 'mine':
                     
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.fillStyle = 'red';
-                    ctx.moveTo( 0, 0);
-                    ctx.lineTo( 5, 5 );
-                    ctx.lineTo( 5, 20 );
-                    ctx.lineTo( 0, 25 );
-                    ctx.lineTo( 0, 0 );
-                    ctx.rotate( ( Math.PI / 180 ) * 0 );
-                    ctx.fill();
-                    ctx.restore();
+                    ctx.fillStyle = '#c9cacc';
+                    ctx.fillRect( 0, 0, widthHeight, widthHeight );
                     
-                    ctx.save();
-                    ctx.translate( 25, 0 );
-                    ctx.rotate( ( Math.PI / 180 ) * 90 );                    
-                    ctx.beginPath();
-                    ctx.fillStyle = 'blue';
-                    ctx.moveTo( 0, 0);
-                    ctx.lineTo( 5, 5 );
-                    ctx.lineTo( 5, 20 );
-                    ctx.lineTo( 0, 25 );
-                    ctx.lineTo( 0, 0 );
-                    ctx.fill();
-                    ctx.translate( -25, -0 );
-                    ctx.restore();
+                    [
+                        { col: '#d6d7d8', translate: [ 0, 0 ] },
+                        { col: '#ecedee', translate: [ widthHeight, 0 ] },
+                        { col: '#a0a1a2', translate: [ widthHeight, widthHeight ] },
+                        { col: '#727374', translate: [ 0, widthHeight ] }
+                    ]
+                        
+                    .forEach(function( elm, ind ){
+                        with ( ctx ){
+                            save();
+                            translate.apply( ctx, elm.translate );
+                            rotate( ( Math.PI / 180 ) * 90 * ind );
+                            beginPath();
+                            fillStyle = elm.col;
+                            moveTo( 0, 0 );
+                            lineTo( borderWidth, borderWidth );
+                            lineTo( borderWidth, widthHeight - borderWidth );
+                            lineTo( 0, widthHeight );
+                            lineTo( 0, 0 );
+                            fill();
+                            restore();
+                        }
+                        
+                    });      
                     
-                    ctx.save();
-                    ctx.translate( 25, 25 );
-                    ctx.rotate( ( Math.PI / 180 ) * 180 );                    
-                    ctx.beginPath();
-                    ctx.fillStyle = 'green';
-                    ctx.moveTo( 0, 0);
-                    ctx.lineTo( 5, 5 );
-                    ctx.lineTo( 5, 20 );
-                    ctx.lineTo( 0, 25 );
-                    ctx.lineTo( 0, 0 );
-                    ctx.fill();
-                    ctx.translate( -25, -25 );
-                    ctx.restore();
-                    
-                    ctx.save();
-                    ctx.translate( 0, 25 );
-                    ctx.rotate( ( Math.PI / 180 ) * 270 );                    
-                    ctx.beginPath();
-                    ctx.fillStyle = 'orange';
-                    ctx.moveTo( 0, 0);
-                    ctx.lineTo( 5, 5 );
-                    ctx.lineTo( 5, 20 );
-                    ctx.lineTo( 0, 25 );
-                    ctx.lineTo( 0, 0 );
-                    ctx.fill();
-                    ctx.translate( -0, -25 );
-                    ctx.restore();
-                                      
+                    if ( state === 'mine' ){
+                        _img = new Image();
+                        _img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAABGdBTUEAALGOfPtRkwAAACBjSFJNAAB6JQAAgIMAAPn/AACA6QAAdTAAAOpgAAA6mAAAF2+SX8VGAAACoElEQVR42mL8//8/AyGgoqLyAUTfuXNHgJBagABiYSACMDMz/2EgEgAEoGKOcQCEQQAAxhqUlXeVrZ/swgbv6golVuPg4HzJ/UIRAUS8aq1LVQsA3GOMIyLw9d77SUQzMzdmXmZW3H1vreV3PAKIAeRlEF6zZg2roqLip8TExCIQPyoqqlVDQ+MV0Lvv2dnZ/4MwiA0SA8mB1IDUgvSA9MLMAQgguAtBLnNwcGj4/v27VE5OTvSqVauq/vxB9SksDF+/fl2Rm5t7BaQWpAekF6YGIIDgLoThzMzMBKA42EW8vLz/eHh4/rOwsIBiDgOD1KLrBwggOGPz5s1MIK/Iycl9ZWJi+t/V1aUMEt+xYwejhYXFRWwGgtSC9ID0wswBCCC4gcAAZhQREQH58T8/P/8/ZFsjIiJ6sBkIwiA9IL0wtQABxATz+ufPn9kEBAQ+g9j//v1j2LlzJyNM7uPHjyq4kglID0gvjA8QQIzKysofQOkMlDRevHjBDaQZgGHGYGxsfAVo+02g4Sxnz571fvXqFdY0CwxrBgkJia9A+sffv39ZAAIIqyJQ7J48eVIHyNRhIBEABBA8nECJFpTOcIUVLgzSA9ILMwcggOBhCEwivz58+MBLqoNAekB6YXyAAIIbCAwrRjc3t05gUvhGrGEgtSA9IL0wMYAAwpmwicHYEjZAADHCii9QRgcWDgWg7ASM3bPLly9f8vbtWyZsLhMWFv4XGRkZ8+bNG2NOTs5nwMJhAqhAAckBBBBcA6jUOHDgQANIweTJk5e7u7t3AAuC16CyEJQ0QBjEBomB5EBqQGpBekB6YeYABBAjcgGLq/iqqKh4C5Lv6OgQJlR8AQQQIzEltrq6+hsQffPmTRFCagECiKgSG5QDiI15gAADAK/yuxFIbOC0AAAAAElFTkSuQmCC';
+                        
+                        ctx.drawImage( _img, borderWidth, borderWidth, widthHeight - 2 * borderWidth, widthHeight - 2 * borderWidth )
+                                                
+                    }
                      
                     break;
+                    
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                    
+                    var textCol = [ 'red', 'green', 'blue', 'black', 'purple', 'orange', 'navy', 'yellow' ][ +state - 1 ];
+                    
+                    ctx.fillStyle = ctx.createPattern( _pattern, 'repeat' );
+                    ctx.fillRect( 0, 0, widthHeight, widthHeight );
+                    
+                    ctx.font = 'bold ' + ( widthHeight - 2 * borderWidth ) + 'px sans';
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = textCol;
+                    ctx.fillText( state, widthHeight / 2, widthHeight - 2 * borderWidth );
+                    
+                    
+                    break;
+                    
+                    
+                
             }
             
             
